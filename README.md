@@ -11,30 +11,32 @@ Replacement for [zlib-dl](https://github.com/Nquxii/zlib-dl)
 - Retrieve metadata without having to go onto annas-archive.org itself
 
 ## Installation
+Requires [uv](https://docs.astral.sh/uv/) and Google Chrome.
+
 Clone the repository and install dependencies
 ```
-git clone https://github.com/Nquxii/anna-dl
+git clone https://github.com/camquyt23/anna-dl
 cd anna-dl
 ```
 ```
-pip3 install -r requirements.in
+uv sync
 ```
 
 Open help section
 ```
-python3 annadl --h
+uv run python annadl --help
 ```
 
 Ensure your config.json is set if you don't want to use several parameters each time.
 
-Add annadl to path (so you don't need to cd into zlib-dl every time) Linux/MacOS:
+Run annadl from anywhere (so you don't need to cd into anna-dl every time) Linux/MacOS — add to your shell rc:
 ```
-ln -s ~[CURRENT DIR]/annadl ~/.local/bin/annadl
+alias annadl='uv run --project [CURRENT DIR] python [CURRENT DIR]/annadl'
 ```
 
 ## Usage
 ```
-python3 annadl [path] --s [query] --n [number of results]
+uv run python annadl [path] --s [query] --n [number of results]
 ```
 Number of results defaults to 5 of the top results available. Use 0 to see all search results on the page.
 
@@ -45,10 +47,10 @@ If none of these options are available, the program will use `./assets/` as its 
 ### Example
 View 5 search results for "The Pragmatic Programmer". Download the resulting file in /home/johndoe/Documents/books
 ```
-python3 annadl /home/johndoe/Documents/books --s "The Pragmatic Programmer"
+uv run python annadl /home/johndoe/Documents/books --s "The Pragmatic Programmer"
 ```
 
 View **all** search results on the first page for "Don Quixote". Download the resulting file in ./assets/ (assuming no set path in config.json)
 ```
-python3 annadl --s "Don Quixote" --n 0
+uv run python annadl --s "Don Quixote" --n 0
 ```

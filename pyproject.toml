@@ -1,0 +1,10 @@
+[project]
+name = "anna-dl"
+version = "0.1.0"
+description = "Download books from Anna's Archive via the terminal"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "selenium>=4.8.2",
+    "webdriver-manager>=3.8.2",
+]
