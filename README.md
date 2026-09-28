@@ -31,7 +31,7 @@ Settings are read from `./config.json` (current directory) first, then `~/.confi
 ```json
 {
     "download_path": "/home/johndoe/Documents/books",
-    "mirrors": ["https://annas-archive.pk", "https://annas-archive.gs"]
+    "mirrors": ["https://annas-archive.pk", "https://annas-archive.gl"]
 }
 ```
 - `download_path`: where downloads go, so you don't need to pass the path each time.
