@@ -2,27 +2,41 @@
 import re
 import time
 
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
-SEARCH_URL = "https://annas-archive.org/search?q={query}"
+# Appended to each mirror's base URL (see config.configured_mirrors)
+SEARCH_PATH = "/search?q={query}"
 
 
-def search(driver: WebDriver, query: str) -> list[WebElement]:
-    '''Open the search page and return the result title links.'''
-    driver.get(SEARCH_URL.format(query=query))
+def search(driver: WebDriver, mirrors: list[str], query: str) -> list[WebElement]:
+    '''Try each mirror in order and return the result title links from the first one that
+    is reachable and has results. Dead or parked domains fall through to the next mirror.'''
+    for base_url in mirrors:
+        print(f"Searching {base_url} ...")
+        try:
+            driver.get(base_url.rstrip('/') + SEARCH_PATH.format(query=query))
+        except WebDriverException as e:
+            print(f"\tUnreachable: {(e.msg or str(e)).splitlines()[0]}")
+            continue
 
-    # Wait for page to load
-    time.sleep(2)
+        # Wait for page to load
+        time.sleep(2)
 
-    # scroll to the bottom of the page so that every element I search for is returned.
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # scroll to the bottom of the page so that every element I search for is returned.
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-    # Wait a bit more for dynamic content
-    time.sleep(1)
+        # Wait a bit more for dynamic content
+        time.sleep(1)
 
-    return driver.find_elements(By.CSS_SELECTOR, 'a.js-vim-focus.custom-a')
+        book_links = driver.find_elements(By.CSS_SELECTOR, 'a.js-vim-focus.custom-a')
+        if book_links:
+            return book_links
+        print("\tNo results")
+
+    return []
 
 
 def _find_container(book_link: WebElement) -> WebElement:

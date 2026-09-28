@@ -27,16 +27,19 @@ uv run annadl --help
 ```
 
 ## Configuration
-Set `download_path` in a `config.json` if you don't want to pass the path each time. It is read from `./config.json` (current directory) first, then `~/.config/anna-dl/config.json`.
+Settings are read from `./config.json` (current directory) first, then `~/.config/anna-dl/config.json`.
 ```json
 {
-    "download_path": "/home/johndoe/Documents/books"
+    "download_path": "/home/johndoe/Documents/books",
+    "mirrors": ["https://annas-archive.pk", "https://annas-archive.gs"]
 }
 ```
+- `download_path`: where downloads go, so you don't need to pass the path each time.
+- `mirrors`: Anna's Archive base URLs, tried in order until one is reachable and returns results. Its domains change often; if searches start failing, point this at the current ones. Defaults to the list in [`src/anna_dl/defaults.json`](src/anna_dl/defaults.json). For a one-off run, use `--mirror URL` (repeatable) instead.
 
 ## Usage
 ```
-annadl [path] --s [query] --n [number of results]
+annadl [path] --s [query] --n [number of results] [--mirror URL]
 ```
 (Use `uv run annadl ...` inside a clone.)
 

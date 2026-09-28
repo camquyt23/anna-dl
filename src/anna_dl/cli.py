@@ -4,7 +4,7 @@ import os
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from anna_dl.config import default_download_path
+from anna_dl.config import configured_mirrors, default_download_path
 from anna_dl.download import download
 from anna_dl.driver import create_driver, enable_downloads
 from anna_dl.search import print_results, search
@@ -22,15 +22,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument('--n', metavar='quantity', type=int, default=5,
                         help='Number of search results desired (0 = all results on the page)')
 
+    parser.add_argument('--mirror', metavar='url', action='append',
+                        help="Anna's Archive base URL to use instead of the configured mirrors (repeatable)")
+
     return parser.parse_args(argv)
 
 
-def run(driver: WebDriver, download_path: str, query: str, result_count: int) -> int:
+def run(driver: WebDriver, download_path: str, mirrors: list[str], query: str, result_count: int) -> int:
     # Ensure download directory exists
     os.makedirs(download_path, exist_ok=True)
     enable_downloads(driver, download_path)
 
-    book_links = search(driver, query)
+    book_links = search(driver, mirrors, query)
     print(f"Found {len(book_links)} book links")
 
     if result_count == 0:
@@ -40,7 +43,8 @@ def run(driver: WebDriver, download_path: str, query: str, result_count: int) ->
         print(f"Only {result_count} results found")
 
     if result_count == 0:
-        print("No results found. Please check your search query.")
+        print("No results found. Please check your search query, or update the mirrors "
+              "in config.json (or pass --mirror) if the domains have changed.")
         return 1
 
     book_links = book_links[:result_count]
@@ -66,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        return run(driver, args.path, args.s, args.n)
+        return run(driver, args.path, args.mirror or configured_mirrors(), args.s, args.n)
     except KeyboardInterrupt:
         print("\nScript interrupted by user")
         return 130
