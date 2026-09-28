@@ -5,6 +5,13 @@ description = "Download books from Anna's Archive via the terminal"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "selenium>=4.8.2",
-    "webdriver-manager>=3.8.2",
+    "selenium>=4.49.0",
+    "webdriver-manager>=4.1.2",
 ]
+
+[project.scripts]
+annadl = "anna_dl.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"

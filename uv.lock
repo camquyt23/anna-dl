@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 [[package]]
 name = "anna-dl"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "selenium" },
     { name = "webdriver-manager" },
@@ -13,8 +13,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "selenium", specifier = ">=4.8.2" },
-    { name = "webdriver-manager", specifier = ">=3.8.2" },
+    { name = "selenium", specifier = ">=4.49.0" },
+    { name = "webdriver-manager", specifier = ">=4.1.2" },
 ]
 
 [[package]]
