@@ -8,11 +8,12 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def _chrome_options() -> Options:
+def _chrome_options(headless: bool) -> Options:
     chrome_options = Options()
 
     # Include this to remove GUI and extensions for the sake of simplicity
-    chrome_options.add_argument("--headless")
+    if headless:
+        chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -48,15 +49,16 @@ def _resolve_chromedriver(driver_path: str) -> str:
     return driver_path
 
 
-def create_driver() -> webdriver.Chrome | None:
-    '''Start headless Chrome, preferring a webdriver-manager chromedriver and falling back to
-    the system one. Returns None (after printing hints) if both fail.'''
+def create_driver(headless: bool = True) -> webdriver.Chrome | None:
+    '''Start Chrome (headless unless told otherwise), preferring a webdriver-manager
+    chromedriver and falling back to the system one. Returns None (after printing hints)
+    if both fail.'''
     # Disable unsightly webdriver-manager log messages
     os.environ['WDM_LOG_LEVEL'] = '0'
     os.environ['WDM_LOG'] = str(logging.NOTSET)
     logging.getLogger('WDM').setLevel(logging.NOTSET)
 
-    chrome_options = _chrome_options()
+    chrome_options = _chrome_options(headless)
 
     try:
         driver_path = _resolve_chromedriver(ChromeDriverManager().install())

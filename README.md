@@ -39,12 +39,19 @@ Settings are read from `./config.json` (current directory) first, then `~/.confi
 
 ## Usage
 ```
-annadl [path] --s [query] --n [number of results] [--mirror URL]
+annadl [path] --s [query] --n [number of results] [--mirror URL] [--show-browser]
 ```
 (Use `uv run annadl ...` inside a clone.)
 
 Number of results defaults to 5 of the top results available. Use 0 to see all search results on the page.
 
+### Browser verification checks
+Some mirrors put a verification page (e.g. DDoS-Guard) in front of the site that headless Chrome can't pass, which shows up as "No results". Add `--show-browser` to open a visible Chrome window: when a mirror returns no results, annadl pauses so you can complete the check in that window, then press Enter to retry (or type `s` to skip to the next mirror).
+```
+annadl --s "The Pragmatic Programmer" --show-browser
+```
+
+### Download location
 If a path in the command is specified, it will be used. Otherwise, the download_path in config.json will be used.
 If none of these options are available, the program will use `./assets/` (relative to the current directory) as its download folder.
 

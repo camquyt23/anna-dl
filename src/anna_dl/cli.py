@@ -25,15 +25,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument('--mirror', metavar='url', action='append',
                         help="Anna's Archive base URL to use instead of the configured mirrors (repeatable)")
 
+    parser.add_argument('--show-browser', action='store_true',
+                        help='Open a visible Chrome window instead of headless, so you can complete '
+                             'browser verification checks (e.g. DDoS-Guard) by hand')
+
     return parser.parse_args(argv)
 
 
-def run(driver: WebDriver, download_path: str, mirrors: list[str], query: str, result_count: int) -> int:
+def run(driver: WebDriver, download_path: str, mirrors: list[str], query: str, result_count: int,
+        manual_check: bool = False) -> int:
     # Ensure download directory exists
     os.makedirs(download_path, exist_ok=True)
     enable_downloads(driver, download_path)
 
-    book_links = search(driver, mirrors, query)
+    book_links = search(driver, mirrors, query, manual_check)
     print(f"Found {len(book_links)} book links")
 
     if result_count == 0:
@@ -45,6 +50,8 @@ def run(driver: WebDriver, download_path: str, mirrors: list[str], query: str, r
     if result_count == 0:
         print("No results found. Please check your search query, or update the mirrors "
               "in config.json (or pass --mirror) if the domains have changed.")
+        if not manual_check:
+            print("If a mirror blocks headless Chrome with a verification check, retry with --show-browser.")
         return 1
 
     book_links = book_links[:result_count]
@@ -65,12 +72,13 @@ def main(argv: list[str] | None = None) -> int:
     # Parse before starting Chrome so --help doesn't need a browser
     args = parse_args(argv)
 
-    driver = create_driver()
+    driver = create_driver(headless=not args.show_browser)
     if driver is None:
         return 1
 
     try:
-        return run(driver, args.path, args.mirror or configured_mirrors(), args.s, args.n)
+        return run(driver, args.path, args.mirror or configured_mirrors(), args.s, args.n,
+                   manual_check=args.show_browser)
     except KeyboardInterrupt:
         print("\nScript interrupted by user")
         return 130

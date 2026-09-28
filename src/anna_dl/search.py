@@ -11,27 +11,42 @@ from selenium.webdriver.remote.webelement import WebElement
 SEARCH_PATH = "/search?q={query}"
 
 
-def search(driver: WebDriver, mirrors: list[str], query: str) -> list[WebElement]:
+def _load_results(driver: WebDriver, url: str) -> list[WebElement]:
+    driver.get(url)
+
+    # Wait for page to load
+    time.sleep(2)
+
+    # scroll to the bottom of the page so that every element I search for is returned.
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    # Wait a bit more for dynamic content
+    time.sleep(1)
+
+    return driver.find_elements(By.CSS_SELECTOR, 'a.js-vim-focus.custom-a')
+
+
+def search(driver: WebDriver, mirrors: list[str], query: str, manual_check: bool = False) -> list[WebElement]:
     '''Try each mirror in order and return the result title links from the first one that
-    is reachable and has results. Dead or parked domains fall through to the next mirror.'''
+    is reachable and has results. Dead or parked domains fall through to the next mirror.
+
+    With manual_check (visible browser), an empty page pauses so the user can complete a
+    browser verification (e.g. DDoS-Guard) in the Chrome window and retry.'''
     for base_url in mirrors:
         print(f"Searching {base_url} ...")
+        url = base_url.rstrip('/') + SEARCH_PATH.format(query=query)
         try:
-            driver.get(base_url.rstrip('/') + SEARCH_PATH.format(query=query))
+            book_links = _load_results(driver, url)
+            while not book_links and manual_check:
+                answer = input("\tNo results. If Chrome shows a verification check, complete it, "
+                               "then press Enter to retry (s = skip this mirror): ")
+                if answer.strip().lower() == 's':
+                    break
+                book_links = _load_results(driver, url)
         except WebDriverException as e:
             print(f"\tUnreachable: {(e.msg or str(e)).splitlines()[0]}")
             continue
 
-        # Wait for page to load
-        time.sleep(2)
-
-        # scroll to the bottom of the page so that every element I search for is returned.
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # Wait a bit more for dynamic content
-        time.sleep(1)
-
-        book_links = driver.find_elements(By.CSS_SELECTOR, 'a.js-vim-focus.custom-a')
         if book_links:
             return book_links
         print("\tNo results")
