@@ -64,7 +64,7 @@ def run(driver: WebDriver, download_path: str, mirrors: list[str], query: str, r
         print("Invalid selection")
         return 1
 
-    download(driver, sresults[book_selection-1], download_path)
+    download(driver, sresults[book_selection-1], download_path, manual_check)
     return 0
 
 

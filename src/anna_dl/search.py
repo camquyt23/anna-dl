@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
+from anna_dl.driver import ask_manual_check
+
 # Appended to each mirror's base URL (see config.configured_mirrors)
 SEARCH_PATH = "/search?q={query}"
 
@@ -37,11 +39,7 @@ def search(driver: WebDriver, mirrors: list[str], query: str, manual_check: bool
         url = base_url.rstrip('/') + SEARCH_PATH.format(query=query)
         try:
             book_links = _load_results(driver, url)
-            while not book_links and manual_check:
-                answer = input("\tNo results. If Chrome shows a verification check, complete it, "
-                               "then press Enter to retry (s = skip this mirror): ")
-                if answer.strip().lower() == 's':
-                    break
+            while not book_links and manual_check and ask_manual_check("No results", "skip this mirror"):
                 book_links = _load_results(driver, url)
         except WebDriverException as e:
             print(f"\tUnreachable: {(e.msg or str(e)).splitlines()[0]}")

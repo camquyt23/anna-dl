@@ -82,6 +82,14 @@ def create_driver(headless: bool = True) -> webdriver.Chrome | None:
         return None
 
 
+def ask_manual_check(problem: str, skip: str) -> bool:
+    '''Ask the user to complete a verification check in the visible Chrome window.
+    Returns True to retry, False if they chose to skip.'''
+    answer = input(f"\t{problem}. If Chrome shows a verification check, complete it, "
+                   f"then press Enter to retry (s = {skip}): ")
+    return answer.strip().lower() != 's'
+
+
 def enable_downloads(driver: webdriver.Chrome, download_path: str) -> None:
     '''Allow headless Chrome to save downloads into download_path.'''
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')

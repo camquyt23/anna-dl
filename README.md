@@ -46,7 +46,7 @@ annadl [path] --s [query] --n [number of results] [--mirror URL] [--show-browser
 Number of results defaults to 5 of the top results available. Use 0 to see all search results on the page.
 
 ### Browser verification checks
-Some mirrors put a verification page (e.g. DDoS-Guard) in front of the site that headless Chrome can't pass, which shows up as "No results". Add `--show-browser` to open a visible Chrome window: when a mirror returns no results, annadl pauses so you can complete the check in that window, then press Enter to retry (or type `s` to skip to the next mirror).
+Some mirrors put a verification page (e.g. DDoS-Guard) in front of the site that headless Chrome can't pass, which shows up as "No results". Add `--show-browser` to open a visible Chrome window. When a mirror returns no results, annadl pauses so you can complete the check in that window, then press Enter to retry (or type `s` to skip to the next mirror). It pauses the same way on the Libgen side, if the GET link is missing or the download doesn't start within 30s.
 ```
 annadl --s "The Pragmatic Programmer" --show-browser
 ```
